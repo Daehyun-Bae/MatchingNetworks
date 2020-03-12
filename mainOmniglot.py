@@ -23,7 +23,7 @@ from logger import Logger
 '''
 
 # Experiment Setup
-batch_size = 32
+batch_size = 16
 fce = False
 classes_per_set = 5
 samples_per_class = 5
@@ -53,11 +53,11 @@ best_val = 0.
 with tqdm.tqdm(total=total_epochs) as pbar_e:
     for e in range(0, total_epochs):
         total_c_loss, total_accuracy = obj_oneShotBuilder.run_training_epoch(total_train_batches=total_train_batches)
-        print("Epoch {}: train_loss: {}, train_accuracy: {}".format(e, total_c_loss, total_accuracy))
+        print("Epoch {}: train_loss: {:.5f}, train_accuracy: {:3f}".format(e, total_c_loss, total_accuracy))
 
         total_val_c_loss, total_val_accuracy = obj_oneShotBuilder.run_validation_epoch(
             total_val_batches=total_val_batches)
-        print("Epoch {}: val_loss: {}, val_accuracy: {}".format(e, total_val_c_loss, total_val_accuracy))
+        print("Epoch {}: val_loss: {:.5f}, val_accuracy: {:.3f}".format(e, total_val_c_loss, total_val_accuracy))
 
         logger.log_value('train_loss', total_c_loss)
         logger.log_value('train_acc', total_accuracy)
@@ -68,7 +68,7 @@ with tqdm.tqdm(total=total_epochs) as pbar_e:
             best_val = total_val_accuracy
             total_test_c_loss, total_test_accuracy = obj_oneShotBuilder.run_testing_epoch(
                 total_test_batches=total_test_batches)
-            print("Epoch {}: test_loss: {}, test_accuracy: {}".format(e, total_test_c_loss, total_test_accuracy))
+            print("Epoch {}: test_loss: {:.5f}, test_accuracy: {:.3f}".format(e, total_test_c_loss, total_test_accuracy))
             logger.log_value('test_loss', total_test_c_loss)
             logger.log_value('test_acc', total_test_accuracy)
         else:

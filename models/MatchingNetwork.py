@@ -18,10 +18,10 @@ from DistanceNetwork import DistanceNetwork
 from AttentionalClassify import AttentionalClassify
 import torch.nn.functional as F
 
+
 class MatchingNetwork(nn.Module):
-    def __init__(self, keep_prob, \
-                 batch_size=100, num_channels=1, learning_rate=0.001, fce=False, num_classes_per_set=5, \
-                 num_samples_per_class=1, nClasses = 0, image_size = 28):
+    def __init__(self, keep_prob, batch_size=100, num_channels=1, learning_rate=0.001, fce=False, num_classes_per_set=5,
+                 num_samples_per_class=1, nClasses=0, image_size=28):
         super(MatchingNetwork, self).__init__()
 
         """
@@ -39,10 +39,10 @@ class MatchingNetwork(nn.Module):
         """
         self.batch_size = batch_size
         self.fce = fce
-        self.g = Classifier(layer_size = 64, num_channels=num_channels,
-                            nClasses= nClasses, image_size = image_size )
+        self.g = Classifier(layer_size=64, num_channels=num_channels,
+                            nClasses=nClasses, image_size=image_size)
         if fce:
-            self.lstm = BidirectionalLSTM(layer_sizes=[32], batch_size=self.batch_size, vector_dim = self.g.outSize)
+            self.lstm = BidirectionalLSTM(layer_sizes=[32], batch_size=self.batch_size, vector_dim=self.g.outSize)
         self.dn = DistanceNetwork()
         self.classify = AttentionalClassify()
         self.keep_prob = keep_prob
@@ -62,12 +62,12 @@ class MatchingNetwork(nn.Module):
         # produce embeddings for support set images
         encoded_images = []
         for i in np.arange(support_set_images.size(1)):
-            gen_encode = self.g(support_set_images[:,i,:,:,:])
+            gen_encode = self.g(support_set_images[:, i, :, :, :])
             encoded_images.append(gen_encode)
 
         # produce embeddings for target images
         for i in np.arange(target_image.size(1)):
-            gen_encode = self.g(target_image[:,i,:,:,:])
+            gen_encode = self.g(target_image[:, i, :, :, :])
             encoded_images.append(gen_encode)
             outputs = torch.stack(encoded_images)
 
@@ -79,13 +79,13 @@ class MatchingNetwork(nn.Module):
             similarities = similarities.t()
 
             # produce predictions for target probabilities
-            preds = self.classify(similarities,support_set_y=support_set_labels_one_hot)
+            preds = self.classify(similarities, support_set_y=support_set_labels_one_hot)
 
             # calculate accuracy and crossentropy loss
             values, indices = preds.max(1)
             if i == 0:
-                accuracy = torch.mean((indices.squeeze() == target_label[:,i]).float())
-                crossentropy_loss = F.cross_entropy(preds, target_label[:,i].long())
+                accuracy = torch.mean((indices.squeeze() == target_label[:, i]).float())
+                crossentropy_loss = F.cross_entropy(preds, target_label[:, i].long())
             else:
                 accuracy = accuracy + torch.mean((indices.squeeze() == target_label[:, i]).float())
                 crossentropy_loss = crossentropy_loss + F.cross_entropy(preds, target_label[:, i].long())
@@ -93,20 +93,19 @@ class MatchingNetwork(nn.Module):
             # delete the last target image encoding of encoded_images
             encoded_images.pop()
 
-        return accuracy/target_image.size(1), crossentropy_loss/target_image.size(1)
+        return accuracy / target_image.size(1), crossentropy_loss / target_image.size(1)
 
 
 class MatchingNetworkTest(unittest.TestCase):
     def setUp(self):
         pass
+
     def tearDown(self):
         pass
+
     def test_accuracy(self):
         pass
 
 
 if __name__ == '__main__':
     unittest.main()
-
-
-

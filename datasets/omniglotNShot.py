@@ -40,9 +40,9 @@ class OmniglotNShotDataset():
                 else:
                     temp[label]=[img]
             self.x = [] # Free memory
-
-            for classes in temp.keys():
-                self.x.append(np.array(temp[temp.keys()[classes]]))
+            for classes in temp.keys():         # class: 0, 1, 2, ..., 1622
+                self.x.append(np.array(temp[classes]))  # tmemp[class]: [20, 28, 28, 1]
+                # self.x.append(np.array(temp[temp.keys()[classes]]))
             self.x = np.array(self.x)
             temp = [] # Free memory
             np.save(os.path.join(dataroot,'data.npy'),self.x)
