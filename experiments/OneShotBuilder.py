@@ -113,15 +113,15 @@ class OneShotBuilder:
                 self.__adjust_learning_rate(optimizer)
 
                 # iter_out = "tr_loss: {}, tr_accuracy: {}".format(c_loss_value.data[0], acc.data[0])   # error occurred
-                iter_out = "tr_loss: {:.5f}, tr_accuracy: {:.2f}".format(c_loss_value, acc)
+                iter_out = "tr_loss: {:.5f}, tr_accuracy: {:.2f}".format(c_loss_value.item(), acc.item())
                 pbar.set_description(iter_out)
                 # print("[{}] tr_loss: {:.5f}, tr_accuracy: {:.2%}".format(i, c_loss_value, acc))
 
                 pbar.update(1)
                 # total_c_loss += c_loss_value.data[0]
-                total_c_loss += c_loss_value
+                total_c_loss += c_loss_value.item()
                 # total_accuracy += acc.data[0]
-                total_accuracy += acc
+                total_accuracy += acc.item()
 
                 self.total_train_iter += 1
                 if self.total_train_iter % 2000 == 0:
@@ -151,9 +151,9 @@ class OneShotBuilder:
                 #     y_support_set = torch.from_numpy(y_support_set).long()
                 #     x_target = torch.from_numpy(x_target).float()
                 #     y_target = torch.from_numpy(y_target).long()
-                x_support_set = Variable(torch.from_numpy(x_support_set)).float()
+                x_support_set = Variable(torch.from_numpy(x_support_set), requires_grad=False).float()
                 y_support_set = Variable(torch.from_numpy(y_support_set), requires_grad=False).long()
-                x_target = Variable(torch.from_numpy(x_target)).float()
+                x_target = Variable(torch.from_numpy(x_target), requires_grad=False).float()
                 y_target = Variable(torch.from_numpy(y_target), requires_grad=False).squeeze().long()
 
                 # y_support_set: Add extra dimension for the one_hot
@@ -178,14 +178,14 @@ class OneShotBuilder:
                                                          x_target, y_target)
 
                 # iter_out = "val_loss: {}, val_accuracy: {}".format(c_loss_value.data[0], acc.data[0])
-                iter_out = "val_loss: {:.5f}, val_accuracy: {:.3f}".format(c_loss_value, acc)
+                iter_out = "val_loss: {:.5f}, val_accuracy: {:.3f}".format(c_loss_value.item(), acc.item())
                 pbar.set_description(iter_out)
                 pbar.update(1)
 
                 # total_val_c_loss += c_loss_value.data[0]
-                total_val_c_loss += c_loss_value
+                total_val_c_loss += c_loss_value.item()
                 # total_val_accuracy += acc.data[0]
-                total_val_accuracy += acc
+                total_val_accuracy += acc.item()
 
         total_val_c_loss = total_val_c_loss / total_val_batches
         total_val_accuracy = total_val_accuracy / total_val_batches
@@ -237,12 +237,12 @@ class OneShotBuilder:
                     acc, c_loss_value = self.matchingNet(x_support_set, y_support_set_one_hot,
                                                          x_target, y_target)
 
-                iter_out = "test_loss: {}, test_accuracy: {}".format(c_loss_value.data[0], acc.data[0])
+                iter_out = "test_loss: {}, test_accuracy: {}".format(c_loss_value.item(), acc.item())
                 pbar.set_description(iter_out)
                 pbar.update(1)
 
-                total_test_c_loss += c_loss_value.data[0]
-                total_test_accuracy += acc.data[0]
+                total_test_c_loss += c_loss_value.item()
+                total_test_accuracy += acc.item()
             total_test_c_loss = total_test_c_loss / total_test_batches
             total_test_accuracy = total_test_accuracy / total_test_batches
         return total_test_c_loss, total_test_accuracy
