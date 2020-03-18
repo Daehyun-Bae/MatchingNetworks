@@ -12,6 +12,7 @@ from datasets import omniglotNShot
 from option import Options
 from experiments.OneShotBuilder import OneShotBuilder
 import tqdm
+import os
 from logger import Logger
 
 '''
@@ -37,12 +38,12 @@ total_test_batches = 250
 args = Options().parse()
 
 LOG_DIR = args.log_dir + '/1_run-batchSize_{}-fce_{}-classes_per_set{}-samples_per_class{}-channels{}' \
-    .format(batch_size,fce,classes_per_set,samples_per_class,channels)
+    .format(batch_size, fce, classes_per_set, samples_per_class, channels)
 
 # create logger
 logger = Logger(LOG_DIR)
 
-data = omniglotNShot.OmniglotNShotDataset(dataroot=args.dataroot, batch_size = batch_size,
+data = omniglotNShot.OmniglotNShotDataset(dataroot=args.dataroot, batch_size=batch_size,
                                           classes_per_set=classes_per_set,
                                           samples_per_class=samples_per_class)
 
@@ -68,9 +69,11 @@ with tqdm.tqdm(total=total_epochs) as pbar_e:
             best_val = total_val_accuracy
             total_test_c_loss, total_test_accuracy = obj_oneShotBuilder.run_testing_epoch(
                 total_test_batches=total_test_batches)
-            print("\nEpoch {}: test_loss: {:.5f}, test_accuracy: {:.3f}".format(e, total_test_c_loss, total_test_accuracy))
+            print("\nEpoch {}: test_loss: {:.5f}, test_accuracy: {:.3f}".format(e, total_test_c_loss,
+                                                                                total_test_accuracy))
             logger.log_value('test_loss', total_test_c_loss)
             logger.log_value('test_acc', total_test_accuracy)
+            obj_oneShotBuilder.save_model(path=os.path.join(LOG_DIR, 'epoch{}_model.pth'.format(e)))
         else:
             total_test_c_loss = -1
             total_test_accuracy = -1

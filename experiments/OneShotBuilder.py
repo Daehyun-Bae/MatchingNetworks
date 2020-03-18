@@ -270,3 +270,7 @@ class OneShotBuilder:
         else:
             raise Exception('Not supported optimizer: {0}'.format(self.optimizer))
         return optimizer
+
+    def save_model(self, path):
+        torch.save(self.matchingNet.state_dict(), path)
+        print("The model is saved at {}".format(path))
